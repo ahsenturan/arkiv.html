@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ARKİV — Proje Yönetim</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f7f7f5;min-height:100vh}
+.header{background:#1a1a2e;color:#fff;padding:16px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.header-title{font-weight:700;font-size:18px;letter-spacing:1px}
+.header-sub{font-size:11px;color:#aaa;letter-spacing:2px}
+.tabs{background:#fff;border-bottom:1px solid #e5e5e5;padding:0 28px;display:flex}
+.tab{padding:14px 22px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#888;border-bottom:2px solid transparent}
+.tab.active{color:#1a1a2e;border-bottom-color:#c9a84c}
+.container{max-width:920px;margin:28px auto;padding:0 16px}
+.card{background:#fff;border-radius:8px;border:1px solid #e5e5e5;padding:28px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;margin-bottom:12px}
+.grid2x{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;display:block;margin-bottom:5px}
+input,textarea,select{width:100%;border:1px solid #e0e0e0;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;box-sizing:border-box}
+input:focus,textarea:focus{border-color:#c9a84c}
+.tasinmaz{background:#f9f9f7;border-radius:6px;padding:18px 18px 14px;margin-bottom:14px}
+.tasinmaz-lbl{font-size:11px;font-weight:700;color:#c9a84c;letter-spacing:1px;margin-bottom:14px}
+.btn{border:none;border-radius:6px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-primary{background:#1a1a2e;color:#fff}
+.btn-secondary{background:#f0f0f0;color:#333}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:5px;cursor:pointer;border:1px solid #ddd;background:none;color:#444}
+.btn-del{border-color:#ffcdd2;color:#c62828}
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar input{flex:1;min-width:180px}
+.toolbar select{border:1px solid #e0e0e0;border-radius:6px;padding:9px 13px;font-size:13px;outline:none;background:#fff;width:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:#f4f4f2;border-bottom:1px solid #e5e5e5}
+th{padding:11px 13px;text-align:left;font-size:11px;font-weight:700;color:#888;letter-spacing:.5px}
+tbody tr{border-bottom:1px solid #f0f0f0}
+tbody tr:nth-child(even){background:#fafaf8}
+td{padding:11px 13px;vertical-align:middle}
+.badge{display:inline-block;border-radius:4px;padding:2px 7px;font-size:11px;margin-right:3px}
+.badge-ada{background:#f0ede6;color:#8b6914}
+.badge-parsel{background:#e8f0e8;color:#2d6a2d}
+.empty{text-align:center;padding:48px;color:#aaa;font-size:14px}
+.tfoot{padding:10px 13px;font-size:12px;color:#aaa;border-top:1px solid #f0f0f0}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);display:none;z-index:999}
+.login-wrap{max-width:420px;margin:80px auto;background:#fff;border-radius:10px;border:1px solid #e5e5e5;padding:40px;text-align:center}
+.login-wrap h2{color:#1a1a2e;margin-bottom:8px;font-size:20px}
+.login-wrap p{color:#888;font-size:13px;margin-bottom:28px;line-height:1.7}
+.btn-google{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:12px 24px;font-size:14px;font-weight:600;color:#333;cursor:pointer}
+.btn-google:hover{background:#f5f5f5}
+.sync{display:flex;align-items:center;gap:6px;font-size:11px;color:#aaa;margin-left:auto}
+.dot{width:7px;height:7px;border-radius:50%;background:#4caf50;display:inline-block}
+.dot.s{background:#ff9800;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:10px;padding:32px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-row{display:flex;gap:8px;margin-bottom:10px;font-size:13px}
+.modal-key{font-weight:700;color:#555;min-width:110px;flex-shrink:0}
+@media(max-width:600px){
+  .grid2,.grid3,.grid2x{grid-template-columns:1fr}
+  .card{padding:18px}
+  th,td{padding:8px}
+}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="header">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.8"><polygon points="3,21 21,21 12,3"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+    <div><div class="header-title">ARKİV</div><div class="header-sub">PROJE YÖNETİM SİSTEMİ</div></div>
+  </div>
+  <div class="login-wrap">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" style="margin-bottom:16px"><polygon points="3,21 21,21 12,3"/></svg>
+    <h2>ARKİV'e Hoş Geldiniz</h2>
+    <p>Verileriniz güvenli şekilde kendi Google Drive hesabınızda saklanır.</p>
+    <button class="btn-google" onclick="signIn()">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Google ile Giriş Yap
+    </button>
+    <p style="margin-top:20px;font-size:11px;color:#bbb">Verileriniz yalnızca sizin Drive hesabınızda saklanır.</p>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="header">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.8"><polygon points="3,21 21,21 12,3"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+    <div><div class="header-title">ARKİV</div><div class="header-sub">PROJE YÖNETİM SİSTEMİ</div></div>
+    <div class="sync"><span class="dot" id="dot"></span><span id="sync-txt">Drive'a bağlı</span></div>
+    <span id="uname" style="font-size:12px;color:#aaa;margin-left:12px"></span>
+    <button onclick="signOut()" style="margin-left:10px;background:none;border:1px solid #444;color:#aaa;border-radius:5px;padding:5px 12px;font-size:12px;cursor:pointer">Çıkış</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="t-form" onclick="goTab('form')">➕  Yeni Proje</button>
+    <button class="tab" id="t-liste" onclick="goTab('liste')">📋  Proje Listesi (<span id="pcount">0</span>)</button>
+  </div>
+  <div class="container">
+
+    <div id="p-form" class="card">
+      <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:22px" id="form-ttl">Yeni Proje Kaydı</div>
+      <div class="grid2">
+        <div><label>MÜŞTERİ ADI SOYADI *</label><input id="f-ad" placeholder="Ad Soyad"/></div>
+        <div><label>TELEFON</label><input id="f-tel" placeholder="05XX XXX XX XX"/></div>
+      </div>
+      <div class="tasinmaz">
+        <div class="tasinmaz-lbl">TASINMAZ BİLGİLERİ</div>
+        <div class="grid3">
+          <div><label>İL *</label><input id="f-il" placeholder="Örn: Giresun"/></div>
+          <div><label>İLÇE</label><input id="f-ilce" placeholder="Örn: Merkez"/></div>
+          <div><label>MAHALLE</label><input id="f-mah" placeholder="Örn: Çınarlar Mah."/></div>
+        </div>
+        <div class="grid2x">
+          <div><label>ADA NO</label><input id="f-ada"/></div>
+          <div><label>PARSEL NO</label><input id="f-parsel"/></div>
+        </div>
+      </div>
+      <div style="margin-bottom:22px"><label>NOTLAR</label><textarea id="f-not" rows="3" placeholder="Proje hakkında notlar..."></textarea></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="kaydet()">Kaydet</button>
+        <button class="btn btn-secondary" id="btn-iptal" style="display:none" onclick="iptal()">İptal</button>
+      </div>
+    </div>
+
+    <div id="p-liste" style="display:none">
+      <div class="toolbar">
+        <input id="ara" placeholder="Müşteri adı veya konum ara..." oninput="renderListe()"/>
+        <select id="fil-il" onchange="renderListe()"><option value="">Tüm İller</option></select>
+        <button class="btn btn-primary" style="padding:9px 16px" onclick="exportCSV()">CSV İndir</button>
+      </div>
+      <div style="background:#fff;border-radius:8px;border:1px solid #e5e5e5;overflow:hidden">
+        <div id="liste-body"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-ici"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+var CLIENT_ID = "361112956844-7v4ts3hr1j473bqbegfqn5c8s3njomft.apps.googleusercontent.com";
+var SCOPES = "https://www.googleapis.com/auth/drive.file";
+var FNAME = "arkiv_projeler.json";
+var token = null, fileId = null, projects = [], editId = null, tokenClient = null;
+
+window.addEventListener("load", function() {
+  var interval = setInterval(function() {
+    if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+      clearInterval(interval);
+      tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: onToken
+      });
+    }
+  }, 300);
+});
+
+function onToken(resp) {
+  if (resp.error) { showToast("Giriş başarısız: " + resp.error); return; }
+  token = resp.access_token;
+  fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(u) { document.getElementById("uname").textContent = u.name || u.email || ""; });
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadFile();
+}
+
+function signIn() {
+  if (!tokenClient) { showToast("Lütfen birkaç saniye bekleyin..."); return; }
+  tokenClient.requestAccessToken();
+}
+
+function signOut() {
+  token = null; projects = []; fileId = null;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+function apiReq(url, opts) {
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  opts.headers["Authorization"] = "Bearer " + token;
+  return fetch(url, opts).then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
+    return r;
+  });
+}
+
+function setSyncing(s) {
+  document.getElementById("dot").className = "dot" + (s ? " s" : "");
+  document.getElementById("sync-txt").textContent = s ? "Kaydediliyor..." : "Drive'a bagli";
+}
+
+function loadFile() {
+  setSyncing(true);
+  var q = encodeURIComponent("name='" + FNAME + "' and trashed=false");
+  apiReq("https://www.googleapis.com/drive/v3/files?q=" + q + "&fields=files(id,name)")
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.files && d.files.length > 0) {
+        fileId = d.files[0].id;
+        return apiReq("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media")
+          .then(function(r) { return r.json(); })
+          .then(function(ps) { projects = Array.isArray(ps) ? ps : []; updateUI(); setSyncing(false); });
+      } else {
+        projects = [];
+        return createFile().then(function() { updateUI(); setSyncing(false); });
+      }
+    }).catch(function(e) { showToast("Hata: " + e.message); setSyncing(false); });
+}
+
+function createFile() {
+  var meta = JSON.stringify({ name: FNAME, mimeType: "application/json" });
+  var fd = new FormData();
+  fd.append("metadata", new Blob([meta], { type: "application/json" }));
+  fd.append("file", new Blob(["[]"], { type: "application/json" }));
+  return apiReq("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", { method: "POST", body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { fileId = d.id; });
+}
+
+function saveFile() {
+  if (!token || !fileId) return;
+  setSyncing(true);
+  apiReq("https://www.googleapis.com/upload/drive/v3/files/" + fileId + "?uploadType=media",
+    { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(projects) })
+    .then(function() { setSyncing(false); })
+    .catch(function(e) { showToast("Kaydetme hatasi: " + e.message); setSyncing(false); });
+}
+
+function updateUI() {
+  document.getElementById("pcount").textContent = projects.length;
+  renderListe();
+  updateIlFilter();
+}
+
+function goTab(t) {
+  document.getElementById("p-form").style.display = t === "form" ? "block" : "none";
+  document.getElementById("p-liste").style.display = t === "liste" ? "block" : "none";
+  document.getElementById("t-form").className = "tab" + (t === "form" ? " active" : "");
+  document.getElementById("t-liste").className = "tab" + (t === "liste" ? " active" : "");
+  if (t === "liste") renderListe();
+}
+
+function getForm() {
+  return {
+    musteriAd: document.getElementById("f-ad").value.trim(),
+    telefon: document.getElementById("f-tel").value.trim(),
+    il: document.getElementById("f-il").value.trim(),
+    ilce: document.getElementById("f-ilce").value.trim(),
+    mahalle: document.getElementById("f-mah").value.trim(),
+    ada: document.getElementById("f-ada").value.trim(),
+    parsel: document.getElementById("f-parsel").value.trim(),
+    not: document.getElementById("f-not").value.trim()
+  };
+}
+
+function fillForm(p) {
+  document.getElementById("f-ad").value = p.musteriAd || "";
+  document.getElementById("f-tel").value = p.telefon || "";
+  document.getElementById("f-il").value = p.il || "";
+  document.getElementById("f-ilce").value = p.ilce || "";
+  document.getElementById("f-mah").value = p.mahalle || "";
+  document.getElementById("f-ada").value = p.ada || "";
+  document.getElementById("f-parsel").value = p.parsel || "";
+  document.getElementById("f-not").value = p.not || "";
+}
+
+function clearForm() {
+  ["f-ad","f-tel","f-il","f-ilce","f-mah","f-ada","f-parsel","f-not"].forEach(function(id) {
+    document.getElementById(id).value = "";
+  });
+}
+
+function kaydet() {
+  var f = getForm();
+  if (!f.musteriAd || !f.il) { showToast("Musteri adi ve il zorunludur."); return; }
+  if (editId !== null) {
+    for (var i = 0; i < projects.length; i++) {
+      if (projects[i].id === editId) {
+        projects[i] = { musteriAd:f.musteriAd, telefon:f.telefon, il:f.il, ilce:f.ilce, mahalle:f.mahalle, ada:f.ada, parsel:f.parsel, not:f.not, id:editId, tarih:projects[i].tarih };
+        break;
+      }
+    }
+    editId = null;
+    document.getElementById("form-ttl").textContent = "Yeni Proje Kaydi";
+    document.getElementById("btn-iptal").style.display = "none";
+    showToast("Proje guncellendi.");
+  } else {
+    projects.push({ musteriAd:f.musteriAd, telefon:f.telefon, il:f.il, ilce:f.ilce, mahalle:f.mahalle, ada:f.ada, parsel:f.parsel, not:f.not, id:Date.now(), tarih:new Date().toLocaleDateString("tr-TR") });
+    showToast("Proje kaydedildi.");
+  }
+  clearForm();
+  saveFile();
+  updateUI();
+  goTab("liste");
+}
+
+function duzenle(id) {
+  var p = null;
+  for (var i = 0; i < projects.length; i++) { if (projects[i].id === id) { p = projects[i]; break; } }
+  if (!p) return;
+  fillForm(p); editId = id;
+  document.getElementById("form-ttl").textContent = "Proje Duzenle";
+  document.getElementById("btn-iptal").style.display = "inline-block";
+  closeModal(); goTab("form");
+}
+
+function sil(id) {
+  if (!confirm("Bu projeyi silmek istediginizden emin misiniz?")) return;
+  projects = projects.filter(function(p) { return p.id !== id; });
+  saveFile(); updateUI(); showToast("Proje silindi.");
+}
+
+function iptal() {
+  editId = null; clearForm();
+  document.getElementById("form-ttl").textContent = "Yeni Proje Kaydi";
+  document.getElementById("btn-iptal").style.display = "none";
+}
+
+function getFiltered() {
+  var q = document.getElementById("ara").value.toLowerCase();
+  var il = document.getElementById("fil-il").value;
+  return projects.filter(function(p) {
+    var ms = !q || (p.musteriAd||"").toLowerCase().indexOf(q) >= 0 || (p.il||"").toLowerCase().indexOf(q) >= 0 || (p.ilce||"").toLowerCase().indexOf(q) >= 0 || (p.mahalle||"").toLowerCase().indexOf(q) >= 0;
+    var mi = !il || p.il === il;
+    return ms && mi;
+  });
+}
+
+function renderListe() {
+  var f = getFiltered();
+  var b = document.getElementById("liste-body");
+  if (!f.length) {
+    b.innerHTML = '<div class="empty">' + (projects.length === 0 ? 'Henuz proje kaydi yok.' : 'Sonuc bulunamadi.') + '</div>';
+    return;
+  }
+  var h = '<table><thead><tr><th>Musteri</th><th>Telefon</th><th>Il / Ilce</th><th>Mahalle</th><th>Ada / Parsel</th><th>Tarih</th><th></th></tr></thead><tbody>';
+  for (var i = 0; i < f.length; i++) {
+    var p = f[i];
+    var ap = (p.ada ? '<span class="badge badge-ada">' + esc(p.ada) + '</span>' : '') + (p.parsel ? '<span class="badge badge-parsel">' + esc(p.parsel) + '</span>' : '');
+    h += '<tr>'
+      + '<td style="font-weight:600;color:#1a1a2e;cursor:pointer" onclick="detay(' + p.id + ')">' + esc(p.musteriAd) + '</td>'
+      + '<td style="color:#555">' + esc(p.telefon || '-') + '</td>'
+      + '<td><span style="color:#1a1a2e">' + esc(p.il) + '</span>' + (p.ilce ? '<span style="color:#888"> / ' + esc(p.ilce) + '</span>' : '') + '</td>'
+      + '<td style="color:#555">' + esc(p.mahalle || '-') + '</td>'
+      + '<td>' + (ap || '-') + '</td>'
+      + '<td style="color:#aaa;font-size:12px">' + esc(p.tarih || '') + '</td>'
+      + '<td style="white-space:nowrap"><button class="btn-sm" onclick="duzenle(' + p.id + ')">Duzenle</button> <button class="btn-sm btn-del" onclick="sil(' + p.id + ')">Sil</button></td>'
+      + '</tr>';
+  }
+  h += '</tbody></table><div class="tfoot">' + f.length + ' proje' + (f.length !== projects.length ? ' (toplam ' + projects.length + ')' : '') + '</div>';
+  b.innerHTML = h;
+}
+
+function updateIlFilter() {
+  var sel = document.getElementById("fil-il");
+  var cur = sel.value;
+  var iller = [];
+  for (var i = 0; i < projects.length; i++) { if (projects[i].il && iller.indexOf(projects[i].il) < 0) iller.push(projects[i].il); }
+  iller.sort();
+  sel.innerHTML = '<option value="">Tum Iller</option>';
+  for (var j = 0; j < iller.length; j++) {
+    sel.innerHTML += '<option value="' + esc(iller[j]) + '"' + (iller[j] === cur ? ' selected' : '') + '>' + esc(iller[j]) + '</option>';
+  }
+}
+
+function detay(id) {
+  var p = null;
+  for (var i = 0; i < projects.length; i++) { if (projects[i].id === id) { p = projects[i]; break; } }
+  if (!p) return;
+  var rows = [["Musteri Adi",p.musteriAd],["Telefon",p.telefon||"-"],["Il",p.il],["Ilce",p.ilce||"-"],["Mahalle",p.mahalle||"-"],["Ada No",p.ada||"-"],["Parsel No",p.parsel||"-"],["Kayit Tarihi",p.tarih||"-"],["Notlar",p.not||"-"]];
+  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h3 style="color:#1a1a2e;font-size:16px">' + esc(p.musteriAd) + '</h3><button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888">x</button></div>';
+  for (var i = 0; i < rows.length; i++) {
+    html += '<div class="modal-row"><span class="modal-key">' + rows[i][0] + '</span><span>' + esc(rows[i][1]) + '</span></div>';
+  }
+  html += '<div style="margin-top:20px"><button class="btn btn-primary" onclick="duzenle(' + p.id + ')">Duzenle</button></div>';
+  document.getElementById("modal-ici").innerHTML = html;
+  document.getElementById("modal").className = "modal-bg open";
+}
+
+function closeModal() { document.getElementById("modal").className = "modal-bg"; }
+
+function exportCSV() {
+  var f = getFiltered();
+  var header = ["Musteri Adi","Telefon","Il","Ilce","Mahalle","Ada","Parsel","Not","Tarih"];
+  var rows = [header];
+  for (var i = 0; i < f.length; i++) {
+    var p = f[i];
+    rows.push([p.musteriAd,p.telefon,p.il,p.ilce,p.mahalle,p.ada,p.parsel,p.not,p.tarih]);
+  }
+  var csv = rows.map(function(r) { return r.map(function(c) { return '"' + (c||"").replace(/"/g,'""') + '"'; }).join(","); }).join("\n");
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+  a.download = "arkiv_projeler.csv";
+  a.click();
+}
+
+function esc(s) {
+  return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function showToast(m) {
+  var t = document.getElementById("toast");
+  t.textContent = m; t.style.display = "block";
+  setTimeout(function() { t.style.display = "none"; }, 3000);
+}
+</script>
+</body>
+</html>
